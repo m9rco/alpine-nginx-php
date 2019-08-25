@@ -1,0 +1,21 @@
+sudo: required
+
+services:
+  - docker
+
+env:
+  DOCKER_COMPOSE_VERSION: 1.8.1
+
+before_install:
+  - sudo rm /usr/local/bin/docker-compose
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - sudo mv docker-compose /usr/local/bin
+  - chmod +x /usr/local/bin/docker-compose
+
+  - docker version
+
+  - docker build --no-cache -t m9rco/alpine-nginx-php:3.8 -f 3.8/Dockerfile 3.8/
+  - docker run --name alpine-nginx-php-3.8 -d -v $PWD:/app m9rco/alpine-nginx-php:3.8
+
+script:
+  - docker exec alpine-nginx-php-3.8 sh -c "apk -V"
